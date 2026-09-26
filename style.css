@@ -1,0 +1,1188 @@
+/* ==========================================================================
+   TYPE//TANK - Retro DOS Arcade Military Terminal Stylesheet
+   Pure CSS. Zero Tailwind, zero external styling libraries.
+   ========================================================================== */
+
+:root {
+  --bg-deep: #020502;
+  --bg-cabinet: #080f08;
+  --bg-card: rgba(4, 18, 7, 0.85);
+  --bg-card-border: #1f6b2d;
+  
+  --phosphor-green: #33ff66;
+  --phosphor-glow: rgba(51, 255, 102, 0.45);
+  --phosphor-dim: #185a26;
+  --phosphor-faded: rgba(51, 255, 102, 0.38);
+  
+  --amber-alert: #ffb000;
+  --amber-glow: rgba(255, 176, 0, 0.45);
+  
+  --crimson-threat: #ff2244;
+  --crimson-glow: rgba(255, 34, 68, 0.55);
+  
+  --text-white: #e8ffe8;
+  --bezel-color: #0b140c;
+
+  --font-arcade: 'Press Start 2P', monospace, sans-serif;
+  --font-terminal: 'Share Tech Mono', 'VT323', Consolas, monospace;
+}
+
+/* Base Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #000000;
+  color: var(--phosphor-green);
+  font-family: var(--font-terminal);
+  font-size: 15px;
+  line-height: 1.35;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ==========================================================================
+   CRT Scanlines & Cathode Bloom Overlay
+   ========================================================================== */
+
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  display: none;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.22) 0px,
+      rgba(0, 0, 0, 0.22) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at center,
+      transparent 60%,
+      rgba(0, 0, 0, 0.65) 90%,
+      rgba(0, 0, 0, 0.92) 100%
+    );
+}
+
+body.crt-enabled .crt-overlay {
+  display: block;
+}
+
+body.crt-enabled .terminal-card,
+body.crt-enabled .mode-card.active,
+body.crt-enabled .metric-primary,
+body.crt-enabled .record-banner {
+  box-shadow: 0 0 14px rgba(51, 255, 102, 0.2), inset 0 0 10px rgba(51, 255, 102, 0.08);
+}
+
+body.crt-enabled .ascii-logo,
+body.crt-enabled .record-banner,
+body.crt-enabled .hud-accent {
+  text-shadow: 0 0 6px var(--phosphor-glow), 0 0 12px var(--phosphor-green);
+}
+
+/* Victory Confetti Overlay */
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1000;
+  display: none;
+}
+
+/* ==========================================================================
+   Arcade Cabinet & Aspect Ratio Modes
+   ========================================================================== */
+
+.arcade-cabinet {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #010401;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Aspect: AUTO (Full Screen Fit) */
+.arcade-cabinet.aspect-auto {
+  width: 100vw;
+  height: 100vh;
+}
+
+.arcade-cabinet.aspect-auto .cabinet-bezel-left,
+.arcade-cabinet.aspect-auto .cabinet-bezel-right {
+  display: none;
+}
+
+/* Aspect: 16:9 (Widescreen Monitor Frame) */
+.arcade-cabinet.aspect-16-9 {
+  width: 100vw;
+  height: 100vh;
+}
+
+.arcade-cabinet.aspect-16-9 .monitor-screen {
+  aspect-ratio: 16 / 9;
+  width: min(100vw, 177.78vh);
+  height: min(100vh, 56.25vw);
+  max-width: 100vw;
+  max-height: 100vh;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.95), 0 0 20px rgba(51, 255, 102, 0.15);
+  border: 4px solid #142817;
+}
+
+.arcade-cabinet.aspect-16-9 .cabinet-bezel-left,
+.arcade-cabinet.aspect-16-9 .cabinet-bezel-right {
+  display: block;
+  flex: 1;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #070e08 0px, #070e08 10px, #040804 10px, #040804 20px);
+  border-left: 2px solid #0f2012;
+  border-right: 2px solid #0f2012;
+}
+
+/* Aspect: 4:3 (Classic CRT Monitor Frame) */
+.arcade-cabinet.aspect-4-3 {
+  width: 100vw;
+  height: 100vh;
+}
+
+.arcade-cabinet.aspect-4-3 .monitor-screen {
+  aspect-ratio: 4 / 3;
+  width: min(100vw, 133.33vh);
+  height: min(100vh, 75vw);
+  max-width: 100vw;
+  max-height: 100vh;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.98), 0 0 25px rgba(51, 255, 102, 0.18);
+  border: 5px solid #142817;
+}
+
+.arcade-cabinet.aspect-4-3 .cabinet-bezel-left,
+.arcade-cabinet.aspect-4-3 .cabinet-bezel-right {
+  display: block;
+  flex: 1;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #09130a 0px, #09130a 12px, #050b06 12px, #050b06 24px);
+  border-left: 3px solid #132716;
+  border-right: 3px solid #132716;
+}
+
+/* Main Inner Monitor Screen Frame */
+.monitor-screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-deep);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Marquee Header HUD
+   ========================================================================== */
+
+.marquee-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: #040e06;
+  border-bottom: 2px solid var(--phosphor-dim);
+  font-family: var(--font-arcade);
+  font-size: 10px;
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ascii-logo {
+  color: var(--phosphor-green);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.glitch-slash {
+  color: var(--crimson-threat);
+}
+
+.header-badge {
+  font-size: 8px;
+  color: var(--amber-alert);
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.op-indicator {
+  color: #559966;
+  font-size: 9px;
+}
+
+.op-callsign {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Micro DOS Buttons */
+.dos-btn-micro {
+  background-color: #06180a;
+  border: 1px solid var(--phosphor-dim);
+  color: var(--phosphor-green);
+  font-family: var(--font-arcade);
+  font-size: 8.5px;
+  padding: 4px 7px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.dos-btn-micro:hover, .dos-btn-micro:focus-visible {
+  background-color: var(--phosphor-green);
+  color: #000000;
+  border-color: #ffffff;
+  outline: none;
+}
+
+.dos-btn-micro.btn-highlight {
+  border-color: var(--amber-alert);
+  color: var(--amber-alert);
+}
+
+.dos-btn-micro.btn-highlight:hover {
+  background-color: var(--amber-alert);
+  color: #000000;
+}
+
+.dos-btn-micro.btn-danger {
+  border-color: var(--crimson-threat);
+  color: var(--crimson-threat);
+}
+
+.dos-btn-micro.btn-danger:hover {
+  background-color: var(--crimson-threat);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Application Container & Screen Switching
+   ========================================================================== */
+
+.app-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+
+.screen-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.screen-view.active-view {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+}
+
+/* 100% Zoom Viewport Fit (No Top Scroll Trap) */
+.screen-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+/* Scrollbar Styling */
+.screen-content-wrapper::-webkit-scrollbar,
+.table-scroll-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.screen-content-wrapper::-webkit-scrollbar-track,
+.table-scroll-container::-webkit-scrollbar-track {
+  background: #020803;
+}
+
+.screen-content-wrapper::-webkit-scrollbar-thumb,
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--phosphor-dim);
+  border: 1px solid var(--phosphor-green);
+}
+
+/* ==========================================================================
+   Terminal Card Architecture (DOS Military Styling)
+   ========================================================================== */
+
+.terminal-card {
+  width: 100%;
+  max-width: 860px;
+  margin: auto; /* Vertically and horizontally centers when space permits, scrollable when small! */
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card-border);
+  padding: 12px 16px;
+  position: relative;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+}
+
+.terminal-card-compact {
+  max-width: 580px;
+}
+
+.card-header {
+  font-family: var(--font-arcade);
+  font-size: clamp(9px, 1.2vw, 11px);
+  color: var(--phosphor-green);
+  text-align: center;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.sub-header {
+  font-family: var(--font-arcade);
+  font-size: 9.5px;
+  color: var(--amber-alert);
+  margin-bottom: 6px;
+}
+
+.mt-sm {
+  margin-top: 10px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.flex-between {
+  justify-content: space-between;
+}
+
+/* Standard DOS Buttons */
+.dos-btn {
+  background-color: #06180a;
+  border: 1.5px solid var(--phosphor-green);
+  color: var(--phosphor-green);
+  font-family: var(--font-arcade);
+  font-size: clamp(8px, 1.1vw, 10px);
+  padding: 8px 12px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.12s ease;
+}
+
+.dos-btn:hover, .dos-btn:focus-visible {
+  background-color: var(--phosphor-green);
+  color: #000000;
+  border-color: #ffffff;
+  outline: none;
+}
+
+.dos-btn-primary {
+  background-color: #0f3d19;
+  border-color: #44ff77;
+  color: #ffffff;
+}
+
+.dos-btn-primary:hover, .dos-btn-primary:focus-visible {
+  background-color: #33ff66;
+  color: #000000;
+}
+
+.dos-btn.btn-danger {
+  border-color: var(--crimson-threat);
+  color: var(--crimson-threat);
+  background-color: #24050a;
+}
+
+.dos-btn.btn-danger:hover, .dos-btn.btn-danger:focus-visible {
+  background-color: var(--crimson-threat);
+  color: #ffffff;
+}
+
+.pulse-btn {
+  animation: pulseGlow 1.8s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 4px rgba(51, 255, 102, 0.3); }
+  100% { box-shadow: 0 0 14px rgba(51, 255, 102, 0.8); }
+}
+
+/* ==========================================================================
+   Screen 1: Login & Callsign
+   ========================================================================== */
+
+.terminal-boot-log {
+  font-family: var(--font-terminal);
+  font-size: 13.5px;
+  color: #7ab887;
+  background-color: #020904;
+  border: 1px dashed var(--phosphor-dim);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+}
+
+.terminal-boot-log p {
+  margin-bottom: 3px;
+}
+
+.login-command-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dos-prompt {
+  font-family: var(--font-arcade);
+  font-size: 10px;
+  color: var(--amber-alert);
+  white-space: nowrap;
+}
+
+.input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #020b04;
+  border: 1.5px solid var(--phosphor-green);
+  padding: 4px 8px;
+}
+
+.dos-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: var(--font-arcade);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.blinking-block-cursor {
+  color: var(--phosphor-green);
+  font-size: 14px;
+  animation: blink 0.8s infinite step-start;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.login-key-hint {
+  font-size: 11px;
+  color: var(--phosphor-dim);
+  text-align: center;
+  margin: 6px 0 10px;
+}
+
+/* ==========================================================================
+   Screen 2: Settings & Arsenal Configuration
+   ========================================================================== */
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 12px;
+}
+
+.mode-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mode-card {
+  background-color: #041407;
+  border: 1.5px solid var(--phosphor-dim);
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mode-card:hover, .mode-card:focus-visible {
+  border-color: var(--phosphor-green);
+  background-color: #09240e;
+  outline: none;
+}
+
+.mode-card.active {
+  border-color: var(--phosphor-green);
+  background-color: #0c3313;
+  box-shadow: 0 0 8px rgba(51, 255, 102, 0.4);
+}
+
+.mode-title {
+  font-family: var(--font-arcade);
+  font-size: 9px;
+  color: var(--phosphor-green);
+  margin-bottom: 3px;
+}
+
+.mode-card.active .mode-title {
+  color: #ffffff;
+}
+
+.mode-desc {
+  font-size: 12px;
+  color: #92cca0;
+  margin-bottom: 4px;
+}
+
+.mode-sample {
+  font-size: 11px;
+  color: var(--amber-alert);
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Granular Character Matrix */
+.matrix-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.matrix-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #c2e6c8;
+  cursor: pointer;
+  background-color: #031106;
+  border: 1px solid #14351a;
+  padding: 4px 8px;
+}
+
+.matrix-label.disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.matrix-label input {
+  display: none;
+}
+
+.custom-chk {
+  font-family: var(--font-arcade);
+  font-size: 9px;
+  color: var(--phosphor-green);
+}
+
+/* Aspect Buttons */
+.aspect-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.aspect-btn {
+  flex: 1;
+  background-color: #051809;
+  border: 1px solid var(--phosphor-dim);
+  color: var(--phosphor-green);
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  padding: 6px 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.1s ease;
+}
+
+.aspect-btn:hover, .aspect-btn:focus-visible {
+  border-color: var(--phosphor-green);
+  background-color: #0e3515;
+  outline: none;
+}
+
+.aspect-btn.active {
+  background-color: var(--phosphor-green);
+  color: #000000;
+  font-weight: bold;
+}
+
+/* Dynamic Live Arsenal Stream Preview Bar */
+.preview-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #020904;
+  border: 1px solid var(--phosphor-dim);
+  padding: 5px 10px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.preview-label {
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  color: var(--amber-alert);
+  white-space: nowrap;
+}
+
+.stream-preview-bar {
+  flex: 1;
+  color: #ffffff;
+  font-family: var(--font-terminal);
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   Screen 3: Instructions & Combat Briefing
+   ========================================================================== */
+
+.briefing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.briefing-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.directive-box {
+  background-color: #031206;
+  border: 1px solid #14401c;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: #a7d9b0;
+}
+
+.directive-box strong {
+  color: #ffffff;
+}
+
+.directive-box.directive-crimson {
+  border-color: rgba(255, 34, 68, 0.45);
+  background-color: #170407;
+}
+
+.directive-box.directive-crimson .directive-num {
+  color: var(--crimson-threat);
+}
+
+.directive-num {
+  font-family: var(--font-arcade);
+  font-size: 8.5px;
+  color: var(--amber-alert);
+  margin-bottom: 3px;
+}
+
+.ready-banner {
+  text-align: center;
+  font-family: var(--font-arcade);
+  font-size: 9px;
+  color: var(--phosphor-green);
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   Screen 4: Game Arena & In-Game Single-Row HUD
+   ========================================================================== */
+
+.game-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-hud {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  background-color: #020904;
+  border-bottom: 2px solid var(--phosphor-dim);
+  font-family: var(--font-arcade);
+  font-size: 9.5px;
+  z-index: 5;
+}
+
+.hud-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hud-lbl {
+  color: #4e8c5d;
+  font-size: 8px;
+}
+
+.hud-val {
+  color: #ffffff;
+}
+
+.hud-accent {
+  color: var(--phosphor-green);
+  font-weight: bold;
+}
+
+.hud-hull-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hull-meter-outer {
+  width: 90px;
+  height: 9px;
+  background-color: #051408;
+  border: 1px solid var(--phosphor-dim);
+  overflow: hidden;
+}
+
+.hull-meter-fill {
+  height: 100%;
+  width: 100%;
+  transition: width 0.15s ease, background-color 0.2s ease;
+}
+
+.fill-green {
+  background-color: #33ff66;
+  box-shadow: 0 0 6px rgba(51, 255, 102, 0.8);
+}
+
+.fill-amber {
+  background-color: #ffb000;
+  box-shadow: 0 0 6px rgba(255, 176, 0, 0.8);
+}
+
+.fill-red {
+  background-color: #ff2244;
+  box-shadow: 0 0 6px rgba(255, 34, 68, 0.8);
+}
+
+.canvas-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   Screen 5: Result & Sortie Debriefing
+   ========================================================================== */
+
+.record-banner {
+  background: #240207;
+  border: 2px solid var(--crimson-threat);
+  color: #ffffff;
+  font-family: var(--font-arcade);
+  font-size: clamp(9px, 1.4vw, 13px);
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 10px;
+  animation: recordFlash 0.9s infinite alternate;
+}
+
+.record-banner.hidden {
+  display: none;
+}
+
+@keyframes recordFlash {
+  0% {
+    background-color: #1e0206;
+    border-color: #ff2244;
+    box-shadow: 0 0 8px rgba(255, 34, 68, 0.4);
+    color: #ffc2cc;
+  }
+  100% {
+    background-color: #570612;
+    border-color: #ffff44;
+    box-shadow: 0 0 20px rgba(255, 255, 68, 0.8);
+    color: #ffffdd;
+  }
+}
+
+.debrief-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: #8acfa0;
+  border-bottom: 1px dashed var(--phosphor-dim);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.status-destroyed {
+  color: var(--crimson-threat);
+}
+
+.record-comparison-bar {
+  font-size: 12px;
+  background-color: #031106;
+  border: 1px solid var(--phosphor-dim);
+  padding: 5px 10px;
+  margin-bottom: 10px;
+  color: var(--amber-alert);
+  text-align: center;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.metric-card {
+  background-color: #031407;
+  border: 1px solid #143d1c;
+  padding: 8px;
+  text-align: center;
+}
+
+.metric-card.metric-primary {
+  border-color: var(--phosphor-green);
+  background-color: #08260e;
+}
+
+.metric-label {
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  color: #6bb07d;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-family: var(--font-arcade);
+  font-size: clamp(11px, 1.6vw, 15px);
+  color: #ffffff;
+}
+
+.metric-primary .metric-value {
+  color: var(--phosphor-green);
+}
+
+.metric-sub {
+  font-size: 9px;
+  color: var(--crimson-threat);
+}
+
+/* ==========================================================================
+   Screen 6: My Records / Flight Logs
+   ========================================================================== */
+
+.lifetime-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.stat-card {
+  background-color: #031306;
+  border: 1px solid #17421e;
+  padding: 6px;
+  text-align: center;
+}
+
+.stat-lbl {
+  font-family: var(--font-arcade);
+  font-size: 7.5px;
+  color: #6bb07d;
+  margin-bottom: 2px;
+}
+
+.stat-val {
+  font-family: var(--font-arcade);
+  font-size: clamp(10px, 1.4vw, 13px);
+  color: #ffffff;
+}
+
+.stat-accent {
+  color: var(--amber-alert);
+}
+
+.mode-bests-quad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mode-best-card {
+  background-color: #041808;
+  border: 1px solid var(--phosphor-dim);
+  padding: 6px;
+  font-size: 11px;
+}
+
+.mb-title {
+  font-family: var(--font-arcade);
+  font-size: 7.5px;
+  color: var(--phosphor-green);
+  margin-bottom: 2px;
+}
+
+.mb-stat {
+  color: #a7dbae;
+}
+
+.mb-stat span {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.log-table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.log-filter-chips {
+  display: flex;
+  gap: 4px;
+}
+
+.filter-chip {
+  background-color: #051609;
+  border: 1px solid var(--phosphor-dim);
+  color: #88c794;
+  font-family: var(--font-arcade);
+  font-size: 7.5px;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+
+.filter-chip:hover, .filter-chip:focus-visible {
+  border-color: var(--phosphor-green);
+  color: #ffffff;
+  outline: none;
+}
+
+.filter-chip.active {
+  background-color: var(--phosphor-green);
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: bold;
+}
+
+.table-scroll-container {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #143d1c;
+  background-color: #020b04;
+}
+
+.dos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  text-align: left;
+}
+
+.dos-table thead {
+  background-color: #061f0b;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.dos-table th {
+  font-family: var(--font-arcade);
+  font-size: 7.5px;
+  color: var(--amber-alert);
+  padding: 5px 8px;
+  border-bottom: 1.5px solid var(--phosphor-dim);
+}
+
+.dos-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #0c2612;
+  color: #c7ebcc;
+  white-space: nowrap;
+}
+
+.dos-table tr:hover {
+  background-color: #082910;
+}
+
+.badge-pb {
+  background-color: #290409;
+  border: 1px solid var(--crimson-threat);
+  color: #ff99aa;
+  font-family: var(--font-arcade);
+  font-size: 7px;
+  padding: 1px 4px;
+  margin-left: 4px;
+  border-radius: 0;
+}
+
+/* ==========================================================================
+   Modals (Abort, Purge, Switch Callsign)
+   ========================================================================== */
+
+.dos-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 998;
+}
+
+.dos-modal-backdrop.hidden {
+  display: none;
+}
+
+.dos-modal {
+  width: 90%;
+  max-width: 480px;
+  background-color: #051608;
+  border: 2px solid var(--crimson-threat);
+  padding: 16px;
+  box-shadow: 0 0 25px rgba(255, 34, 68, 0.35);
+}
+
+.modal-body-text {
+  font-size: 13px;
+  color: #ffb8c4;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.modal-body-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* ==========================================================================
+   Tactical Footer
+   ========================================================================== */
+
+.arcade-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 12px;
+  background-color: #030a04;
+  border-top: 1px solid #0f2b14;
+  font-size: 10.5px;
+  color: #4c8759;
+}
+
+.footer-tip {
+  font-family: var(--font-arcade);
+  font-size: 7.5px;
+}
+
+.footer-copy {
+  font-size: 10px;
+  color: #3b6b45;
+}
+
+/* ==========================================================================
+   Responsive Adaptations & Ultra-Compact Adjustments
+   ========================================================================== */
+
+@media (max-height: 700px) {
+  .terminal-card {
+    padding: 8px 12px;
+  }
+  .card-header {
+    margin-bottom: 6px;
+  }
+  .settings-grid {
+    gap: 8px;
+  }
+  .briefing-grid {
+    gap: 6px;
+  }
+  .directive-box {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .table-scroll-container {
+    max-height: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-grid,
+  .briefing-grid {
+    grid-template-columns: 1fr;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .lifetime-grid,
+  .mode-bests-quad {
+    grid-template-columns: 1fr 1fr;
+  }
+}
